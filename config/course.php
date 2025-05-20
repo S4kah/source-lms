@@ -6,6 +6,7 @@ return [
         'youtube' => 'Youtube',
         'vimeo' => 'Vimeo',
         'external_link' => 'External Link',
+        'html5' => 'HTML5'
     ],
 
     'file_types' => [
@@ -14,6 +15,7 @@ return [
         'doc' => 'Doc',
         'pdf' => 'Pdf',
         'file' => 'File',
+        'html5' => 'HTML5'
     ]
 
 ];

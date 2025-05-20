@@ -12,6 +12,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class CourseContentController extends Controller
 {
@@ -48,29 +50,74 @@ class CourseContentController extends Controller
         return view('admin.course.course-module.partials.chapter-lesson-modal', compact('courseId', 'chapterId'))->render();
     }
 
-    function storeLesson(Request $request): RedirectResponse
+    function storeLesson(Request $request)
     {
         $rules = [
             'title' => ['required', 'string', 'max:255'],
             'source' => ['required', 'string'],
-            'file_type' => ['required', 'in:video,audio,file,pdf,doc'],
+            'file_type' => ['required', 'in:video,audio,file,pdf,doc,html5'],
             'duration' => ['required'],
             'is_preview' => ['nullable', 'boolean'],
             'downloadable' => ['nullable', 'boolean'],
             'description' => ['required']
         ];
-        if ($request->filled('file')) {
-            $rules['file'] = ['required'];
-        } else {
-            $rules['url'] = ['required'];
+
+        switch ($request->source) {
+            case 'upload':
+                $rules['file'] = ['required', 'string'];
+                break;
+
+            case 'html5':
+                $rules['zip'] = ['required', 'file', 'mimes:zip', 'max:102400'];
+                $rules['defaultFileName'] = ['required', 'string'];
+                break;
+
+            default:
+                $rules['url'] = ['required', 'url'];
+                break;
         }
+
         $request->validate($rules);
 
         $lesson = new CourseChapterLession();
+
         $lesson->title = $request->title;
-        $lesson->slug = \Str::slug($request->title);
+        $lesson->slug = Str::slug($request->title);
         $lesson->storage = $request->source;
-        $lesson->file_path = $request->filled('file') ? $request->file : $request->url;
+        if ($request->source === 'html5') {
+            $zipFile = $request->file('zip');
+            $originalName = pathinfo($zipFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $extractPath = storage_path("app/public/html5/{$originalName}");
+
+            $zip = new \ZipArchive();
+            if ($zip->open($zipFile->getRealPath()) === true) {
+                $zip->extractTo($extractPath);
+                $zip->close();
+            } else {
+                return response()->json(['success' => false, 'message' => 'Failed to open ZIP file'], 500);
+            }
+
+            $indexPath1 = $extractPath . '/' . $originalName . '/' . $request->defaultFileName;
+            $indexPath2 = $extractPath . '/' . $request->defaultFileName;
+
+            if (File::exists($indexPath1)) {
+                $finalPath = $indexPath1;
+            } elseif (File::exists($indexPath2)) {
+                $finalPath = $indexPath2;
+            } else {
+                return response()->json(['success' => false, 'message' => 'Default file not found in ZIP'], 404);
+            }
+
+            $relativePath = str_replace(storage_path('app/public/html5'), '', $finalPath);
+            $relativePath = ltrim(str_replace('\\', '/', $relativePath), '/');
+
+            $lesson->file_path = '/storage/html5/' . $relativePath;
+        } elseif ($request->source === 'upload') {
+            $lesson->file_path = $request->file;
+        } else {
+            $lesson->file_path = $request->url;
+        }
+
         $lesson->file_type = $request->file_type;
         $lesson->duration = $request->duration;
         $lesson->is_preview = $request->filled('is_preview') ? 1 : 0;
@@ -162,7 +209,7 @@ class CourseContentController extends Controller
 
         $lesson = CourseChapterLession::findOrFail($id);
         $lesson->title = $request->title;
-        $lesson->slug = \Str::slug($request->title);
+        $lesson->slug = Str::slug($request->title);
         $lesson->storage = $request->source;
         $lesson->file_path = $request->filled('file') ? $request->file : $request->url;
         $lesson->file_type = $request->file_type;
@@ -195,9 +242,10 @@ class CourseContentController extends Controller
 
 
     /** Sort chapter lessons */
-    function sortLesson(Request $request, string $id) {
+    function sortLesson(Request $request, string $id)
+    {
         $newOrders = $request->order_ids;
-        foreach($newOrders as $key => $itemId) {
+        foreach ($newOrders as $key => $itemId) {
             $lesson = CourseChapterLession::where(['chapter_id' => $id, 'id' => $itemId])->first();
             $lesson->order = $key + 1;
             $lesson->save();
@@ -207,15 +255,17 @@ class CourseContentController extends Controller
     }
 
     /** return sort chapter list */
-    function sortChapter(string $id) : string {
+    function sortChapter(string $id): string
+    {
         $chapters = CourseChapter::where('course_id', $id)->orderBy('order')->get();
 
         return view('admin.course.course-module.partials.course-chapter-sort-modal', compact('chapters'))->render();
     }
 
-    function updateSortChapter(Request $request, string $id) {
+    function updateSortChapter(Request $request, string $id)
+    {
         $newOrders = $request->order_ids;
-        foreach($newOrders as $key => $itemId) {
+        foreach ($newOrders as $key => $itemId) {
             $lesson = CourseChapter::where(['course_id' => $id, 'id' => $itemId])->first();
             $lesson->order = $key + 1;
             $lesson->save();
