@@ -2,10 +2,10 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Certificate</title>
     <style>
         .certificate-body {
@@ -15,6 +15,7 @@
             background-repeat: no-repeat;
             text-align: center;
         }
+
         body {
             margin: 0;
             padding: 0;
@@ -42,7 +43,19 @@
         .certificate-body .signature img {
             width: 120px;
             height: 100px;
+        }
 
+        .certificate-body .grade {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        #grade {
+            position: relative !important;
+            top: 150px;
+            left: 0 !important;
+            text-align: center;
+            width: 100%;
         }
 
         @foreach($certificateItems as $item)
@@ -52,6 +65,7 @@
                 position: relative;
             }
         @endforeach
+
     </style>
 </head>
 
@@ -60,8 +74,12 @@
         <div id="title" class="title draggable-element">{{ $certificate->title }}</div>
         <div id="subtitle" class="subtitle draggable-element">{{ $certificate->sub_title }}</div>
         <div id="description" class="descrition draggable-element">{{ $certificate->description }}</div>
-        <div id="signature" class="signature draggable-element"><img src="{{ public_path($certificate->signature) }}"
-                alt=""></div>
+
+        <div id="signature" class="signature draggable-element">
+            <img src="{{ public_path($certificate->signature) }}" alt="" />
+        </div>
+
+        <div id="grade" class="grade draggable-element">Your Grade is "{{ $grade }}"</div>
     </div>
 </body>
 
