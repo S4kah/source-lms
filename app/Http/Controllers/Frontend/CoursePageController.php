@@ -62,6 +62,7 @@ class CoursePageController extends Controller
             ->where('is_approved', 'approved')
             ->where('status', 'active')
             ->firstOrFail();
+
         $reviews = Review::where('course_id', $course->id)->where('status', 1)->paginate(10);
         
 

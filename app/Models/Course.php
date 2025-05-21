@@ -48,4 +48,9 @@ class Course extends Model
     {
         return $this->hasMany(Enrollment::class, 'course_id', 'id');
     }
+
+    function excercise(): HasOne
+    {
+        return $this->hasOne(Exercise::class, 'course_id', 'id');
+    }
 }

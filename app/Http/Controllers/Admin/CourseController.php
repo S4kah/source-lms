@@ -10,6 +10,7 @@ use App\Models\CourseCategory;
 use App\Models\CourseChapter;
 use App\Models\CourseLanguage;
 use App\Models\CourseLevel;
+use App\Models\Exercise;
 use App\Models\User;
 use App\Traits\FileUpload;
 use Illuminate\Contracts\View\View;
@@ -91,7 +92,9 @@ class CourseController extends Controller
             case '3':
                 $courseId = $request->id;
                 $chapters = CourseChapter::where(['course_id' => $courseId])->orderBy('order')->get();
-                return view('admin.course.course-module.course-content', compact('courseId', 'chapters'));
+                $exercises = Exercise::where('course_id', $courseId)->get();
+                
+                return view('admin.course.course-module.course-content', compact('courseId', 'chapters', 'exercises'));
                 break;
 
             case '4':

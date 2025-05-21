@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CertificateController;
+use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\Frontend\BlogController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\CheckoutController;
@@ -26,59 +27,59 @@ use Illuminate\Support\Facades\Route;
  * ------------------------------------------------------
  */
 
- Route::get('/', [FrontendController::class, 'index'])->name('home');
- Route::get('/courses', [CoursePageController::class, 'index'])->name('courses.index');
- Route::get('/courses/{slug}', [CoursePageController::class, 'show'])->name('courses.show');
+Route::get('/', [FrontendController::class, 'index'])->name('home');
+Route::get('/courses', [CoursePageController::class, 'index'])->name('courses.index');
+Route::get('/courses/{slug}', [CoursePageController::class, 'show'])->name('courses.show');
 
 
- /** Cart routes */
- Route::get('cart', [CartController::class, 'index'])->name('cart.index')->middleware('auth');
- Route::post('add-to-cart/{course}', [CartController::class, 'addToCart'])->name('add-to-cart')->middleware('auth');
- Route::get('remove-from-cart/{id}', [CartController::class, 'removeFromCart'])->name('remove-from-cart')->middleware('auth');
+/** Cart routes */
+Route::get('cart', [CartController::class, 'index'])->name('cart.index')->middleware('auth');
+Route::post('add-to-cart/{course}', [CartController::class, 'addToCart'])->name('add-to-cart')->middleware('auth');
+Route::get('remove-from-cart/{id}', [CartController::class, 'removeFromCart'])->name('remove-from-cart')->middleware('auth');
 
- /** Payment Routes */
- Route::get('checkout', CheckoutController::class)->name('checkout.index');
+/** Payment Routes */
+Route::get('checkout', CheckoutController::class)->name('checkout.index');
 
- Route::get('paypal/payment', [PaymentController::class, 'payWithPaypal'])->name('paypal.payment');
- Route::get('paypal/success', [PaymentController::class, 'paypalSuccess'])->name('paypal.success');
- Route::get('paypal/cancel', [PaymentController::class, 'paypalCancel'])->name('paypal.cancel');
+Route::get('paypal/payment', [PaymentController::class, 'payWithPaypal'])->name('paypal.payment');
+Route::get('paypal/success', [PaymentController::class, 'paypalSuccess'])->name('paypal.success');
+Route::get('paypal/cancel', [PaymentController::class, 'paypalCancel'])->name('paypal.cancel');
 
- /** Stripe Routes */
- Route::get('stripe/payment', [PaymentController::class, 'payWithStripe'])->name('stripe.payment');
- Route::get('stripe/success', [PaymentController::class, 'stripeSuccess'])->name('stripe.success');
- Route::get('stripe/cancel', [PaymentController::class, 'stripeCancel'])->name('stripe.cancel');
- /** Razorpay Routes */
- Route::get('razorpay/redirect', [PaymentController::class, 'razorpayRedirect'])->name('razorpay.redirect');
- Route::post('razorpay/payment', [PaymentController::class, 'payWithRazorpay'])->name('razorpay.payment');
+/** Stripe Routes */
+Route::get('stripe/payment', [PaymentController::class, 'payWithStripe'])->name('stripe.payment');
+Route::get('stripe/success', [PaymentController::class, 'stripeSuccess'])->name('stripe.success');
+Route::get('stripe/cancel', [PaymentController::class, 'stripeCancel'])->name('stripe.cancel');
+/** Razorpay Routes */
+Route::get('razorpay/redirect', [PaymentController::class, 'razorpayRedirect'])->name('razorpay.redirect');
+Route::post('razorpay/payment', [PaymentController::class, 'payWithRazorpay'])->name('razorpay.payment');
 
- Route::get('order-success', [PaymentController::class, 'orderSuccess'])->name('order.success');
- Route::get('order-failed', [PaymentController::class, 'orderFailed'])->name('order.failed');
+Route::get('order-success', [PaymentController::class, 'orderSuccess'])->name('order.success');
+Route::get('order-failed', [PaymentController::class, 'orderFailed'])->name('order.failed');
 
- Route::post('newsletter-subscribe', [FrontendController::class, 'subscribe'])->name('newsletter.subscribe');
- /** about route */
- Route::get('about', [FrontendController::class, 'about'])->name('about.index');
+Route::post('newsletter-subscribe', [FrontendController::class, 'subscribe'])->name('newsletter.subscribe');
+/** about route */
+Route::get('about', [FrontendController::class, 'about'])->name('about.index');
 
- /** Contact route */
- Route::get('contact', [FrontendContactController::class, 'index'])->name('contact.index');
- Route::post('contact', [FrontendContactController::class, 'sendMail'])->name('send.contact');
+/** Contact route */
+Route::get('contact', [FrontendContactController::class, 'index'])->name('contact.index');
+Route::post('contact', [FrontendContactController::class, 'sendMail'])->name('send.contact');
 
- /** Review Routes */
- Route::post('review', [CoursePageController::class, 'storeReview'])->name('review.store');
+/** Review Routes */
+Route::post('review', [CoursePageController::class, 'storeReview'])->name('review.store');
 
- /** Custom page Routes */
- Route::get('page/{slug}', [FrontendController::class, 'customPage'])->name('custom-page');
+/** Custom page Routes */
+Route::get('page/{slug}', [FrontendController::class, 'customPage'])->name('custom-page');
 
- /** Blog Routes */
- Route::get('blog', [BlogController::class, 'index'])->name('blog.index');
- Route::get('blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
- Route::post('blog/comment/{id}', [BlogController::class, 'storeComment'])->name('blog.comment.store');
+/** Blog Routes */
+Route::get('blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+Route::post('blog/comment/{id}', [BlogController::class, 'storeComment'])->name('blog.comment.store');
 
 /**
  * ------------------------------------------------------
  * Student Routes
  * ------------------------------------------------------
  */
-Route::group(['middleware' => ['auth:web', 'verified', 'check_role:student'], 'prefix' => 'student', 'as' => 'student.'], function() {
+Route::group(['middleware' => ['auth:web', 'verified', 'check_role:student'], 'prefix' => 'student', 'as' => 'student.'], function () {
    Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
    Route::get('/become-instructor', [StudentDashboardController::class, 'becomeInstructor'])->name('become-instructor');
    Route::post('/become-instructor/{user}', [StudentDashboardController::class, 'becomeInstructorUpdate'])->name('become-instructor.update');
@@ -88,6 +89,9 @@ Route::group(['middleware' => ['auth:web', 'verified', 'check_role:student'], 'p
    Route::post('profile/update', [ProfileController::class, 'profileUpdate'])->name('profile.update');
    Route::post('profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.update-password');
    Route::post('profile/update-social', [ProfileController::class, 'updateSocial'])->name('profile.update-social');
+
+   // EXERCISE
+   Route::post('/exercise/{course}/submit-exercise', [ExerciseController::class, 'submitExercise'])->name('submit-exercise');
 
    /** Enroll Courses Routes */
    Route::get('enrolled-courses', [EnrolledCourseController::class, 'index'])->name('enrolled-courses.index');
@@ -106,7 +110,6 @@ Route::group(['middleware' => ['auth:web', 'verified', 'check_role:student'], 'p
 
    Route::get('orders', [StudentOrderController::class, 'index'])->name('orders.index');
    Route::get('orders/{order}', [StudentOrderController::class, 'show'])->name('orders.show');
-
 });
 
 /**
@@ -114,7 +117,7 @@ Route::group(['middleware' => ['auth:web', 'verified', 'check_role:student'], 'p
  * Instructor Routes
  * ------------------------------------------------------
  */
-Route::group(['middleware' => ['auth:web', 'verified', 'check_role:instructor'], 'prefix' => 'instructor', 'as' => 'instructor.'], function() {
+Route::group(['middleware' => ['auth:web', 'verified', 'check_role:instructor'], 'prefix' => 'instructor', 'as' => 'instructor.'], function () {
    Route::get('/dashboard', [InstructorDashboardController::class, 'index'])->name('dashboard');
 
    /** Profile Routes */
@@ -165,14 +168,13 @@ Route::group(['middleware' => ['auth:web', 'verified', 'check_role:instructor'],
 
    /** lfm Routes */
    Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
-         \UniSharp\LaravelFilemanager\Lfm::routes();
+      \UniSharp\LaravelFilemanager\Lfm::routes();
    });
-
 });
 
 
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
-require __DIR__.'/admin.php';
+require __DIR__ . '/admin.php';

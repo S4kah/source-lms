@@ -46,6 +46,7 @@ use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\TopBarController;
 use App\Http\Controllers\Admin\VideoSectionController;
 use App\Http\Controllers\Admin\WithdrawRequestController;
+use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\Frontend\HeroController;
 use App\Models\BecomeInstructorSection;
 use App\Models\FeaturedInstructor;
@@ -134,6 +135,10 @@ Route::group(["middleware" => "auth:admin", "prefix" => "admin", "as" => "admin.
 
     Route::get('courses/{id}/edit', [CourseController::class, 'edit'])->name('courses.edit');
     Route::post('courses/update', [CourseController::class, 'update'])->name('courses.update');
+
+    Route::post('/course-content/store-exercise', [ExerciseController::class, 'store'])->name('course-content.store-exercise');
+    Route::put('/course-content/exercise/{exercise}', [ExerciseController::class, 'update'])->name('course-content.update-exercise');
+    Route::delete('/course-content/exercise/{exercise}', [ExerciseController::class, 'destroy'])->name('course-content.destroy-exercise');
 
     Route::get('course-content/{course}/create-chapter', [CourseContentController::class, 'createChapterModal'])->name('course-content.create-chapter');
     Route::post('course-content/{course}/create-chapter', [CourseContentController::class, 'storeChapter'])->name('course-content.store-chapter');

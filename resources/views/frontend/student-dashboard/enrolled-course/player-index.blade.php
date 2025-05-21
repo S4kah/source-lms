@@ -7,7 +7,7 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
     <meta name="base_url" content="{{ url('/') }}">
     <meta name="csrf_token" content="{{ csrf_token() }}">
-    <title>EduCore - Online Courses & Education HTML Template</title>
+    <title>Segaris Media Teknologi - Online Courses & Education HTML Template</title>
     <link rel="icon" type="image/png" href="images/favicon.png">
     <link rel="stylesheet" href="{{ asset('frontend/assets/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('frontend/assets/css/bootstrap.min.css') }}">
@@ -92,6 +92,11 @@
                         <button class="nav-link" id="pills-disabled-tab" data-bs-toggle="pill"
                             data-bs-target="#pills-disabled" type="button" role="tab"
                             aria-controls="pills-disabled" aria-selected="false">Reviews</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-exercise-tab" data-bs-toggle="pill"
+                            data-bs-target="#pills-exercise" type="button" role="tab"
+                            aria-controls="pills-exercise" aria-selected="false">Exercises</button>
                     </li>
                 </ul>
                 <div class="tab-content" id="pills-tabContent">
@@ -960,6 +965,81 @@
 
                         </div>
                     </div>
+
+                    <div class="tab-pane fade" id="pills-exercise" role="tabpanel" aria-labelledby="pills-disabled-tab" tabindex="0">
+                        <div class="video_review">
+                            @if ($exercises->count())
+                                @if ($hasSubmitted)
+                                    <div class="alert alert-success">
+                                        <strong>You've already submitted the exercise.</strong><br>
+                                        Your Grade is <span class="badge bg-success">{{ $grade }}</span>
+                                    </div>
+                                    @foreach ($exercises as $index => $exercise)
+                                        <div class="p-3 mb-4 border rounded bg-light">
+                                            <p><strong>Question {{ $index + 1 }}:</strong> {{ $exercise->question }}</p>
+                                            @php
+                                                $userAnswer = $exercise->results->firstWhere('user_id', auth()->id())->selected_answer ?? null;
+                                                $isCorrect = $exercise->results->firstWhere('user_id', auth()->id())->is_correct ?? false;
+                                            @endphp
+                                            
+                                            @foreach (['a', 'b', 'c', 'd'] as $letter)
+                                                <div class="group">
+                                                    <input class="form-check-input" type="radio"
+                                                        disabled
+                                                        {{ $userAnswer === $letter ? 'checked' : '' }}>
+                                                    <label class="form-check-label {{ $letter === $exercise->correct_answer ? 'text-success' : '' }}">
+                                                        {{ strtoupper($letter) }}. {{ $exercise->{'answer_'.$letter} }}
+                                                        @if ($letter === $exercise->correct_answer)
+                                                            <span class="badge bg-success">Correct</span>
+                                                        @endif
+                                                        @if ($userAnswer === $letter && $letter !== $exercise->correct_answer)
+                                                            <span class="badge bg-danger">Your Answer</span>
+                                                        @endif
+                                                    </label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <form action="{{ route('student.submit-exercise', $course->id) }}" method="POST">
+                                        @csrf
+                                        @foreach ($exercises as $index => $exercise)
+                                            <div class="p-3 mb-4 border rounded bg-light">
+                                                <p><strong>Question {{ $index + 1 }}:</strong> {{ $exercise->question }}</p>
+
+                                                @foreach (['a', 'b', 'c', 'd'] as $letter)
+                                                <div class="mb-2">
+                                                    <div class="form-check">
+                                                        <input
+                                                            class="form-check-input"
+                                                            type="radio"
+                                                            name="answers[{{ $exercise->id }}]"
+                                                            value="{{ $letter }}"
+                                                            id="exercise_{{ $exercise->id }}_{{ $letter }}"
+                                                        >
+                                                        <label
+                                                            class="form-check-label"
+                                                            for="exercise_{{ $exercise->id }}_{{ $letter }}"
+                                                        >
+                                                            <span class="font-weight-bold">{{ $letter }}. {{ $exercise->{'answer_'.$letter} }}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                        @endforeach
+
+                                        <div class="d-flex justify-content-end">
+                                            <button type="submit" class="gap-2 btn btn-primary d-flex">Submit Answers <i class="ti ti-checks"></i></button>
+                                        </div>
+                                    </form>
+                                @endif
+                            @else
+                                <p>No exercises found for this course.</p>
+                            @endif
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
