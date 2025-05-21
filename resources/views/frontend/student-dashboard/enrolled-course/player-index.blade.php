@@ -1005,7 +1005,7 @@
                                         @csrf
                                         @foreach ($exercises as $index => $exercise)
                                             <div class="p-3 mb-4 border rounded bg-light">
-                                                <p><strong>Question {{ $index + 1 }}:</strong> {{ $exercise->question }}</p>
+                                                <p class="mb-2"><strong>Question {{ $index + 1 }}:</strong> {{ $exercise->question }}</p>
 
                                                 @foreach (['a', 'b', 'c', 'd'] as $letter)
                                                 <div class="mb-2">
@@ -1021,7 +1021,10 @@
                                                             class="form-check-label"
                                                             for="exercise_{{ $exercise->id }}_{{ $letter }}"
                                                         >
-                                                            <span class="font-weight-bold">{{ $letter }}. {{ $exercise->{'answer_'.$letter} }}
+                                                        <strong>
+                                                            {{ $letter }}.
+                                                        </strong>
+                                                             {{ $exercise->{'answer_'.$letter} }}
                                                         </label>
                                                     </div>
                                                 </div>
